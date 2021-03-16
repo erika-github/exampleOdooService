@@ -26,6 +26,7 @@ import com.example.odooService.utility.ResponseLogin;
 import com.example.odooService.utility.ResponseCalling;
 import com.example.odooService.utility.RespListingRecord;
 
+
 @RestController
 @Controller
 @RequestMapping(value = "/odoo")
