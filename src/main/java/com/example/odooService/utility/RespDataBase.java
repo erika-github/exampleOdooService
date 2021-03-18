@@ -3,7 +3,7 @@ package com.example.odooService.utility;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Response_db {
+public class RespDataBase {
 
 	private String status;
 	private String url;
@@ -11,11 +11,11 @@ public class Response_db {
 	private String username;
 	private String password;
 
-	public Response_db() {
+	public RespDataBase() {
 
 	}
 
-	public Response_db(String status, String url, String db, String username, String password) {
+	public RespDataBase(String status, String url, String db, String username, String password) {
 
 		this.status = status;
 		this.url = url;

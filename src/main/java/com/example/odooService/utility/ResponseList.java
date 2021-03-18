@@ -6,17 +6,17 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Response_list {
+public class ResponseList {
 
 	private String status;
 
 	private List<Object> listado = Arrays.asList();
 
-	public Response_list() {
+	public ResponseList() {
 
 	}
 
-	public Response_list(String status, List<Object> listado) {
+	public ResponseList(String status, List<Object> listado) {
 
 		this.status = status;
 		this.listado = listado;

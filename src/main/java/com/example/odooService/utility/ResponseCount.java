@@ -3,16 +3,16 @@ package com.example.odooService.utility;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ResponseInt {
+public class ResponseCount {
 
 	private String status;
 	private Integer cantidadRegistros;
 
-	public ResponseInt() {
+	public ResponseCount() {
 
 	}
 
-	public ResponseInt(String status, Integer cantidadRegistros) {
+	public ResponseCount(String status, Integer cantidadRegistros) {
 
 		this.status = status;
 		this.cantidadRegistros = cantidadRegistros;

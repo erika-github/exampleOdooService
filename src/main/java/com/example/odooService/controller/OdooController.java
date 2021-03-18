@@ -2,6 +2,10 @@ package com.example.odooService.controller;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlrpc.XmlRpcException;
@@ -14,18 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
-import com.example.odooService.utility.Response_list;
-import com.example.odooService.utility.Response_db;
-import com.example.odooService.utility.ResponseInt;
-import com.example.odooService.utility.ResponseLogin;
-import com.example.odooService.utility.ResponseCalling;
 import com.example.odooService.utility.RespListingRecord;
-
+import com.example.odooService.utility.ResponseCalling;
+import com.example.odooService.utility.ResponseCount;
+import com.example.odooService.utility.ResponseList;
+import com.example.odooService.utility.ResponseLogin;
+import com.example.odooService.utility.RespDataBase;
+import com.example.odooService.utility.RespCreateRecord;
 
 @RestController
 @Controller
@@ -36,19 +35,22 @@ public class OdooController {
 	private ResponseLogin responselogin;
 
 	@Autowired
-	private ResponseInt responseint;
+	private ResponseCount responsecount;
 
 	@Autowired
-	private Response_db responsedb;
+	private RespDataBase responsedb;
 
 	@Autowired
-	private Response_list responselist;
+	private ResponseList responselist;
 
 	@Autowired
 	private ResponseCalling responsecalling;
 
 	@Autowired
 	private RespListingRecord resplistingrecord;
+
+	@Autowired
+	private RespCreateRecord rescreaterecord;
 
 	@Value("${login.OdooController.conect}")
 	private String login;
@@ -68,11 +70,11 @@ public class OdooController {
 	@Value("${uid.OdooController}")
 	private int usserId;
 
-	final Map<String, Object> map = null;
+	// final Map<String, Object> map = null;
 
 	// Servicio de autenticación.
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public ResponseLogin Connect() throws MalformedURLException, XmlRpcException {
 		XmlRpcClient xmlrpcLogin = new XmlRpcClient();
 
@@ -106,8 +108,8 @@ public class OdooController {
 
 	// Servicio de solicitud de una base de datos de prueba a Odoo.
 
-	@RequestMapping(value = "/dataBase", method = RequestMethod.POST)
-	public Response_db dataBase() throws XmlRpcException, MalformedURLException {
+	@RequestMapping(value = "/dataBase", method = RequestMethod.GET)
+	public RespDataBase dataBase() throws XmlRpcException, MalformedURLException {
 
 		final XmlRpcClient client = new XmlRpcClient();
 
@@ -144,7 +146,7 @@ public class OdooController {
 
 	}
 
-	@RequestMapping(value = "/calling", method = RequestMethod.POST)
+	@RequestMapping(value = "/calling", method = RequestMethod.GET)
 	public ResponseCalling callinMethods() throws MalformedURLException, XmlRpcException {
 
 		try {
@@ -201,8 +203,8 @@ public class OdooController {
 	// Servicio que devuelve los identificadores de la base de datos de todos los
 	// registros que coinciden con el filtro.
 
-	@RequestMapping(value = "/list", method = RequestMethod.POST)
-	public Response_list list() throws MalformedURLException, XmlRpcException {
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public ResponseList list() throws MalformedURLException, XmlRpcException {
 
 		try {
 			final XmlRpcClient models = new XmlRpcClient() {
@@ -249,8 +251,8 @@ public class OdooController {
 	// Servicio para recuperar solo el número de registros que coinciden con la
 	// consulta.
 
-	@RequestMapping(value = "/count", method = RequestMethod.POST)
-	public ResponseInt count() throws XmlRpcException, MalformedURLException {
+	@RequestMapping(value = "/count", method = RequestMethod.GET)
+	public ResponseCount count() throws XmlRpcException, MalformedURLException {
 
 		try {
 
@@ -275,30 +277,30 @@ public class OdooController {
 					Arrays.asList(dataBase, usserId, password, "res.partner", "search_count",
 							Arrays.asList(Arrays.asList(Arrays.asList("is_company", "=", true)))));
 
-			responseint.setStatus("OK");
-			responseint.setCantidadRegistros(contar);
-			return responseint;
+			responsecount.setStatus("OK");
+			responsecount.setCantidadRegistros(contar);
+			return responsecount;
 
 		} catch (XmlRpcException ex) {
 
-			responseint.setStatus("NOT-OK: " + ex);
-			return responseint;
+			responsecount.setStatus("NOT-OK: " + ex);
+			return responsecount;
 
 		}
 
 		catch (Exception e) {
 
-			responseint.setStatus("NOT-OK: " + e);
-			return responseint;
+			responsecount.setStatus("NOT-OK: " + e);
+			return responsecount;
 		}
 
 	}
 
 	// Servicio que hace la búsqueda de campos en específico de los registros que
-	// existen la base de datos. Limitando la búsqueda a solo cinco(5) registros.
+	// existen la base de datos. Limitando la búsqueda a solo doce(12) registros.
 
-	@RequestMapping(value = "/search", method = RequestMethod.POST)
-	public Response_list searchRead() throws XmlRpcException, MalformedURLException {
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public ResponseList searchRead() throws XmlRpcException, MalformedURLException {
 
 		try {
 			final XmlRpcClient models = new XmlRpcClient() {
@@ -320,7 +322,9 @@ public class OdooController {
 
 			List<Object> asList2 = Arrays.asList((Object[]) models.execute("execute_kw",
 					Arrays.asList(dataBase, usserId, password, "res.partner", "search_read",
-							Arrays.asList(Arrays.asList(Arrays.asList("is_company", "=", true))),
+							
+							//Arrays.asList(Arrays.asList(Arrays.asList("is_company", "=", true))),
+							Arrays.asList(Arrays.asList(Arrays.asList("is_company", "!=", true))),							
 							new HashMap<String, Object>() {
 								/**
 								 * 
@@ -328,8 +332,8 @@ public class OdooController {
 								private static final long serialVersionUID = 1L;
 
 								{
-									put("fields", Arrays.asList("name", "country_id", "comment"));
-									put("limit", 5);
+									put("fields", Arrays.asList("name", "country_id", "comment", "company_type"));
+									put("limit", 12);
 								}
 							})));
 
@@ -356,7 +360,7 @@ public class OdooController {
 	// Servicio que se utiliza para inspeccionar los campos de un modelo y comprobar
 	// cuáles parecen ser de interés.
 
-	@RequestMapping(value = "/listingRecordFields", method = RequestMethod.POST)
+	@RequestMapping(value = "/listingRecordFields", method = RequestMethod.GET)
 	public RespListingRecord listingRecordFields() throws XmlRpcException, MalformedURLException {
 
 		try {
@@ -411,5 +415,61 @@ public class OdooController {
 
 		}
 
+	}
+	
+	//Servicio para crear un registro. (Devuelve su identificador de Base de Datos).
+
+	@RequestMapping(value = "/createRecord", method = RequestMethod.POST)
+	public RespCreateRecord createRecord() throws XmlRpcException, MalformedURLException {
+
+		try {
+
+			final XmlRpcClient models = new XmlRpcClient() {
+				{
+					setConfig(new XmlRpcClientConfigImpl() {
+
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						{
+
+							setServerURL(new URL("http", host, port, "/xmlrpc/2/object"));
+						}
+					});
+				}
+			};
+
+			final Integer id = (Integer) models.execute("execute_kw", Arrays.asList(dataBase, usserId, password,
+					"res.partner", "create", Arrays.asList(new HashMap<String, Object>() {
+						/**
+						* 
+						*/
+						private static final long serialVersionUID = 1L;
+
+						{
+							put("name", "New Partner2");
+						}
+					})));
+
+			rescreaterecord.setStatus("OK");
+			rescreaterecord.setIdRegistro(id);
+
+			return rescreaterecord;
+
+		} catch (XmlRpcException ex) {
+
+			responselist.setStatus("NOT-OK: " + ex);
+			return rescreaterecord;
+
+		}
+
+		catch (Exception e) {
+
+			responselist.setStatus("NOT-OK: " + e);
+			return rescreaterecord;
+
+		}
 	}
 }
